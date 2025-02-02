@@ -143,4 +143,4 @@ MIT License - see LICENSE.md
 - Firebase
 - Cloudinary
 - React.js Community
-- TailwindCSS Team
+- TailwindCSS Team# praktikum-akbid
