@@ -1,20 +1,22 @@
 // src/services/firebase/db.service.js
 import { 
   collection, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
   doc, 
   getDoc, 
   getDocs, 
-  query, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc,
+  query,
   where,
+  orderBy,
   serverTimestamp 
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import { COLLECTIONS } from '../../config/constants';
 
 /**
- * Create document in Firestore
+ * Create a new document
  */
 export const createDocument = async (collectionName, data) => {
   try {
@@ -31,7 +33,7 @@ export const createDocument = async (collectionName, data) => {
 };
 
 /**
- * Get document by ID
+ * Get a document by ID
  */
 export const getDocument = async (collectionName, documentId) => {
   try {
@@ -49,7 +51,7 @@ export const getDocument = async (collectionName, documentId) => {
 };
 
 /**
- * Update document in Firestore
+ * Update a document
  */
 export const updateDocument = async (collectionName, documentId, data) => {
   try {
@@ -65,7 +67,7 @@ export const updateDocument = async (collectionName, documentId, data) => {
 };
 
 /**
- * Delete document from Firestore
+ * Delete a document
  */
 export const deleteDocument = async (collectionName, documentId) => {
   try {
@@ -80,13 +82,19 @@ export const deleteDocument = async (collectionName, documentId) => {
 /**
  * Query documents with conditions
  */
-export const queryDocuments = async (collectionName, conditions = []) => {
+export const queryDocuments = async (collectionName, conditions = [], orderByField = null) => {
   try {
     let q = collection(db, collectionName);
     
-    conditions.forEach(condition => {
-      q = query(q, where(condition.field, condition.operator, condition.value));
-    });
+    if (conditions.length > 0) {
+      conditions.forEach(condition => {
+        q = query(q, where(condition.field, condition.operator, condition.value));
+      });
+    }
+    
+    if (orderByField) {
+      q = query(q, orderBy(orderByField.field, orderByField.direction || 'asc'));
+    }
     
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
